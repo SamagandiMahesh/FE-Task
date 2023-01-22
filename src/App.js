@@ -1,25 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import * as React from "react";
+import { Routes, Route } from 'react-router-dom';
+import Loader from "./components/atoms/Loader/Loader";
 
-function App() {
+import Layout from "./pages/Layout";
+
+const Home = React.lazy(() => import("./pages/Home"));
+const Results = React.lazy(() => import("./pages/Results"));
+const NoMatch =  React.lazy(() => import("./pages/NoMatch"));
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+    <Route path="/" element={<Layout />}>
+      <Route index element={ <React.Suspense fallback={<Loader />}>
+            <Home />
+          </React.Suspense>} />
+      <Route path="home" element={
+         <React.Suspense fallback={<Loader />}>
+         <Home />
+       </React.Suspense>
+      } />
+      <Route
+        path="results"
+        element={
+          <React.Suspense fallback={<Loader />}>
+            <Results />
+          </React.Suspense>
+        }
+      />
+      <Route path="*" element={<NoMatch />} />
+    </Route>
+  </Routes>
   );
 }
-
-export default App;

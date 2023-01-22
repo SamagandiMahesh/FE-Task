@@ -1,0 +1,81 @@
+import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
+import ItineraryList from "../components/molecules/ItineraryList/ItineraryList";
+import Title from "../components/atoms/Title/TitleH2";
+import { gql, useQuery } from '@apollo/client';
+
+const GET_ITINERARIES = gql`
+  query {
+    itineraries {
+      departureDate {
+        year
+        month
+        dayOfMonth
+      }
+      arrivalDate {
+        year
+        month
+        dayOfMonth
+      }
+      departureLocation
+      arrivalLocation
+      carrier
+      price
+    }
+  }
+`;
+
+const Results = (props) => {
+  const { label } = props;
+  const location = useLocation();
+  const { toLoc, fromLoc, date } = location.state;
+  const [filteredList, setFilteredList] = useState([]);
+  const { data } = useQuery(GET_ITINERARIES);
+
+  useEffect(() => {
+    let tempList = data['itineraries'];
+    if(toLoc && fromLoc) {
+      tempList =  getItinerayData(tempList);
+    } 
+    tempList.sort(function (a, b) {
+      return b.price - a.price;
+    });
+    console.log(tempList, date);
+    setFilteredList(tempList);
+  }, [data]);
+
+  const getItinerayData = (data) => {
+   return data.filter((ele) => {
+      if (ele.departureLocation === fromLoc && ele.arrivalLocation === toLoc) {
+        if(!date) {
+          return ele;
+        } else {
+          const  availableDate = new Date(ele.departureDate.year, ele.departureDate.month, ele.departureDate.dayOfMonth).toLocaleDateString();
+          const selectedDate = new Date(date).toLocaleDateString()
+          if  ( selectedDate === availableDate ) {
+            return ele;
+          }
+        }
+      }
+    }).sort((a,b) => b.price -  a.price);
+  };
+
+  return (
+    <React.Fragment>
+       {filteredList && (<><Title title={label} />
+      {filteredList.length > 0 && <ItineraryList filteredList={filteredList} />}
+      {filteredList.length === 0 && <Title title="No Results to display"/>}
+       )}
+    </React.Fragment>
+  );
+};
+
+Results.defaultProps = {
+  label: "Results",
+};
+Results.propTypes = {
+  label: PropTypes.string,
+};
+
+export default Results;

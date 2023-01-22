@@ -3,11 +3,21 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter } from "react-router-dom";
+// import { ApolloProvider, ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";?
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+// const client = new ApolloClient({
+//   link: new HttpLink({uri:`http://localhost:4000/graphql`}),
+//    cache: new InMemoryCache(),
+//    onError: (e) => { console.log(e) },
+
+// });
+
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </React.StrictMode>
 );
 
